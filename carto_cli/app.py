@@ -40,24 +40,24 @@ class CARTOUser(object):
 
 
 @click.group()
-@click.option('--user-name', envvar='CARTO_USER',
-              help='Your CARTO.com user. It can be omitted if CARTO_USER '+
+@click.option('-u','--user-name', envvar='CARTO_USER',
+              help='Your CARTO.com user. It can be omitted if $CARTO_USER '+
               'is available')
-@click.option('--org-name', envvar='CARTO_ORG',
-              help='Your organization name. It can be ommitted if CARTO_ORG '+
+@click.option('-o','--org-name', envvar='CARTO_ORG',
+              help='Your organization name. It can be ommitted if $CARTO_ORG '+
               'is available')
-@click.option('--api-url', envvar='CARTO_API_URL',
+@click.option('-a','--api-url', envvar='CARTO_API_URL',
               help='If you are not using carto.com you need to specify your ' +
-              'API endpoint')
-@click.option('--api-key', envvar='CARTO_API_KEY',
-              help='CARTO API KEY. It can be omitted if CARTO_API_KEY ' +
+              'API endpoint. It can be omitted if $CARTO_API_URL is available')
+@click.option('-k','--api-key', envvar='CARTO_API_KEY',
+              help='It can be omitted if $CARTO_API_KEY ' +
               'is available')
 @click.pass_context
 def cli(ctx, user_name, org_name, api_url, api_key):
     ctx.obj = CARTOUser(user_name=user_name,org_name=org_name,api_url=api_url,api_key=api_key)
 
 
-@click.command(help="Gets the number of records of a table")
+@cli.command(help="Gets the number of records of a table")
 @click.argument('table_name')
 @click.pass_obj
 def count(carto_obj, table_name):
@@ -68,7 +68,8 @@ def count(carto_obj, table_name):
     click.echo(count)
 
 
-@click.command(help='Gets the BBOX of a table')
+
+@cli.command(help='Gets the BBOX of a table')
 @click.argument('table_name')
 @click.pass_obj
 def bbox(carto_obj, table_name):
@@ -92,7 +93,7 @@ def bbox(carto_obj, table_name):
     click.echo("NE: {:+9.4f} | {:+9.4f}".format(xmax, ymax))
 
 
-@click.command(help='List schemas')
+@cli.command(help='List schemas')
 @click.pass_obj
 def schema_list(carto_obj):
     rows = carto_obj.execute_sql('''
@@ -105,7 +106,7 @@ def schema_list(carto_obj):
         click.echo(row.get('user'))
 
 
-@click.command(help='List users tables')
+@cli.command(help='List users tables')
 @click.pass_obj
 def table_list(carto_obj):
     rows = carto_obj.execute_sql('''
@@ -119,7 +120,7 @@ def table_list(carto_obj):
         click.echo(row.get('table_name'))
 
 
-@click.command(help='Import a local file')
+@cli.command(help='Import a local file')
 @click.argument('file_path')
 @click.option('--create-vis', type=bool, default=True,
               help="Create a visualization too?")
@@ -159,14 +160,6 @@ More ideas on commands to add:
 
 - Debug levels?
 '''
-
-
-cli.add_command(count)
-cli.add_command(bbox)
-cli.add_command(table_list)
-cli.add_command(schema_list)
-cli.add_command(import_file)
-
 
 if __name__ == '__main__':
     cli()
