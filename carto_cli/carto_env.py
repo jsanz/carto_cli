@@ -2,6 +2,7 @@ import click
 import os.path
 import yaml
 
+from .generic_commands.version import version
 
 default_config_file = os.path.join(os.path.expanduser("~"), '.cartorc.yaml')
 
@@ -74,6 +75,7 @@ def load(ctx, user):
         if org != None:
             click.echo(' export CARTO_ORG={org}'.format(org=org))
 
+cli.add_command(version)
 
 if __name__ == '__main__':
     cli(obj={})
