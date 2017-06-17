@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
+from carto_cli.generic_commands.version import CARTO_CLI_VERSION
 import os
 
 # Utility function to read the README file.
@@ -23,16 +24,14 @@ try:
 except:
     pass
 
-
-
 setup(name="carto-cli",
       author="Jorge Sanz",
       author_email="jorge@carto.com",
-      description="Command Line application to interact with your CARTO account",
+      description="Command Line applications to interact with your CARTO account",
       long_description=read('README.md'),
       keywords = "carto cli cartodb api",
       license="MIT",
-      version="0.0",
+      version=CARTO_CLI_VERSION,
       url="https://github.com/CartoDB/carto-cli",
       install_requires=required,
       packages=find_packages(),
@@ -40,4 +39,7 @@ setup(name="carto-cli",
       entry_points='''
 [console_scripts]
 carto_cli=carto_cli.app:cli
+carto_env=carto_cli.carto_env:cli
+carto_sql=carto_cli.carto_sql:cli
+carto_dataset=carto_cli.carto_dataset:cli
       ''')
