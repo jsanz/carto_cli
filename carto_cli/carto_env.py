@@ -4,13 +4,15 @@ import yaml
 
 from .generic_commands.version import version
 
-default_config_file = os.path.join(os.path.expanduser("~"), '.cartorc.yaml')
+default_config_file = os.environ.get(
+    'CARTO_DB', os.path.join(os.path.expanduser("~"), '.cartorc.yaml'))
 
 
 @click.group(help='Allows you to get the account details')
 @click.option('-c', '--config-file', type=click.File('r'),
               default=default_config_file,
-              help="Configuration file to read, defaults to ~/.cartorc.yaml")
+              help="Configuration file to read, defaults to ~/.cartorc.yaml " +
+                   "or the environment variable $CARTO_DB")
 @click.help_option('-h', '--help')
 @click.pass_context
 def cli(ctx, config_file):
@@ -23,6 +25,7 @@ def cli(ctx, config_file):
 
 
 @cli.command(help='List your stored users')
+@click.help_option('-h', '--help')
 @click.pass_context
 def list(ctx):
     '''
@@ -34,6 +37,7 @@ def list(ctx):
 
 @cli.command(help='Returns the user names that match the given string')
 @click.argument('search')
+@click.help_option('-h', '--help')
 @click.pass_context
 def search(ctx, search):
     '''
@@ -45,9 +49,13 @@ def search(ctx, search):
 
 
 @cli.command(help='The user wou want to retrieve')
+@click.option('-o', '--output-file', type=click.File('w'), envvar='CARTO_ENV',
+              help="Output file to store the export commands, it can use the" +
+                   " $CARTO_ENV environment variable")
 @click.argument('user')
+@click.help_option('-h', '--help')
 @click.pass_context
-def load(ctx, user):
+def load(ctx, output_file, user):
     '''
     Tries to load the information as a easy copy&paste set of env vars
     '''
@@ -67,13 +75,18 @@ def load(ctx, user):
         else:
             url = 'https://{}.carto.com/'.format(user)
 
-        click.echo('''
- export CARTO_USER={user}
- export CARTO_API_KEY={api_key}
- export CARTO_API_URL={url}'''.format(user=user, org=org, api_key=api_key, url=url))
+        result = '''
+ export CARTO_USER="{user}"\n
+ export CARTO_API_KEY="{api_key}"\n
+ export CARTO_API_URL="{url}"\n'''.format(user=user, org=org, api_key=api_key, url=url)
 
         if org != None:
-            click.echo(' export CARTO_ORG={org}'.format(org=org))
+            result = result + '\n export CARTO_ORG="{org}"\n'.format(org=org)
+
+        if output_file:
+            output_file.write(result)
+        else:
+            click.echo(result)
 
 cli.add_command(version)
 

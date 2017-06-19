@@ -2,7 +2,7 @@ import click
 import json
 from prettytable import PrettyTable
 
-@click.command(help="Shows the current running queries")
+@click.command(help="Display all your dataset names")
 @click.option('-o','--output',type=click.File('w'),
               help="Output file to generate instead of printing directly")
 @click.option('-p','--pretty',default=False,is_flag=True, help="Formats only some relevant fields for easy reading")
