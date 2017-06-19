@@ -1,9 +1,14 @@
-`carto_cli`
+`$ carto_cli`
 =========================
 
-A simple command line application to interact with your own CARTO account.
-
 **WORK IN PROGRESS**
+
+A simple set of command line applications to interact with your own CARTO account.
+
+
+* `carto_env`: load your credentials to interact with your account
+* `carto_sql`: perform queries against your SQL API
+* `carto_dataset`: manage your CARTO datasets
 
 ## How-to's
 
