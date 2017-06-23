@@ -1,5 +1,6 @@
 from carto.exceptions import CartoException
 from carto.sql import SQLClient
+from carto.sql import BatchSQLClient
 from carto.auth import APIKeyAuthClient
 
 
@@ -26,6 +27,7 @@ class CARTOUser(object):
             self.client = APIKeyAuthClient(self.api_url, self.api_key)
 
         self.sql_client = SQLClient(self.client)
+        self.batch_client = BatchSQLClient(self.client)
 
     def execute_sql(self, query, parse_json=True, format=None, do_post=False):
         try:
@@ -37,3 +39,34 @@ class CARTOUser(object):
                                         format=format, do_post=do_post)
         except CartoException as e:
             raise Exception(e.args[0].args[0][0])
+
+    def batch_check(self,job_id):
+        try:
+            try:
+                self.client
+            except AttributeError:
+                self.initialize()
+            return self.batch_client.read(job_id)
+        except CartoException as e:
+            raise Exception(e.args[0].args[0][0])
+
+    def batch_create(self,query):
+        try:
+            try:
+                self.client
+            except AttributeError:
+                self.initialize()
+            return self.batch_client.create(query)
+        except CartoException as e:
+            raise Exception(e.args[0].args[0][0])
+
+    def batch_cancel(self,job_id):
+        try:
+            try:
+                self.client
+            except AttributeError:
+                self.initialize()
+            return self.batch_client.cancel(job_id)
+        except CartoException as e:
+            raise Exception(e.args[0].args[0][0])
+

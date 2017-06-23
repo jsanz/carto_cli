@@ -41,5 +41,6 @@ setup(name="carto-cli",
 carto_cli=carto_cli.app:cli
 carto_env=carto_cli.carto_env:cli
 carto_sql=carto_cli.carto_sql:cli
+carto_batch=carto_cli.carto_batch:cli
 carto_dataset=carto_cli.carto_dataset:cli
       ''')
