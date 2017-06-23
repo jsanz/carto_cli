@@ -35,3 +35,28 @@ def execute(ctx,format,output,explain,explain_analyze,sql):
             click.echo(result,nl=format=='json')
     except Exception as e:
         ctx.fail("Error executing your SQL: {}".format(e))
+
+
+@click.command(help="Kills a query based on its pid")
+@click.argument('pid',type=int)
+@click.help_option('-h', '--help')
+@click.pass_context
+def kill(ctx,pid):
+    carto_obj = ctx.obj['carto']
+    sql = '''SELECT pg_cancel_backend({})
+from pg_stat_activity where usename=current_user;'''.format(pid)
+
+    try:
+        result = carto_obj.execute_sql(sql)
+        if 'rows' in result and len(result['rows']) > 0:
+            cancelling = result['rows'][0]['pg_cancel_backend']
+
+            if cancelling:
+                click.echo('Query cancelled')
+            else:
+                ctx.fail('Invalid PID?')
+        else:
+            ctx.fail("Error cancelling the query")
+    except Exception as e:
+        ctx.fail("Error executing your SQL: {}".format(e))
+

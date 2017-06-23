@@ -6,6 +6,7 @@ from .generic_commands.carto_user import CARTOUser
 from .generic_commands.version import version
 
 from .sql_commands.execute_sql import execute
+from .sql_commands.execute_sql import kill
 from .sql_commands.running_queries import queries
 
 
@@ -31,6 +32,7 @@ def cli(ctx, user_name, org_name, api_url, api_key):
 
 cli.add_command(version)
 cli.add_command(execute)
+cli.add_command(kill)
 cli.add_command(queries)
 
 
