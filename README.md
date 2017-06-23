@@ -37,7 +37,7 @@ Setting up those variables will save you having to put them on any call to the c
 
 If you happen to work with a different set of CARTO accounts this tool is for you. This relies in a yaml file that with a very simple structure. This command wil load information into your terminal so you can copy & paste once and export your environment variables for your session or if you have the `$CARTO_ENV` environment or use the `-o` parameter it will save it in a file so you can source it.
 
-```bash
+```
 $ carto_env -h
 Usage: carto_env [OPTIONS] COMMAND [ARGS]...
 
@@ -84,7 +84,7 @@ another_user:
 
 ## `carto_sql`
 
-```bash
+```
 $ carto_sql -h
 Usage: carto_sql [OPTIONS] COMMAND [ARGS]...
 
@@ -109,12 +109,38 @@ Commands:
 
 Check for details on each command as they have especific options.
 
+## `carto_batch`
+
+```
+$ carto_batch -h
+Usage: carto_batch [OPTIONS] COMMAND [ARGS]...
+
+  Performs different actions against the Batch SQL API
+
+Options:
+  -u, --user-name TEXT  Your CARTO.com user. It can be omitted if $CARTO_USER
+                        is available
+  -o, --org-name TEXT   Your organization name. It can be ommitted if
+                        $CARTO_ORG is available
+  -a, --api-url TEXT    If you are not using carto.com you need to specify
+                        your API endpoint. It can be omitted if $CARTO_API_URL
+                        is available
+  -k, --api-key TEXT    It can be omitted if $CARTO_API_KEY is available
+  -h, --help            Show this message and exit.
+
+Commands:
+  cancel   Cancels a job
+  create   Creates a new job and returns its ID
+  list     Display the ids of all your running jobs
+  read     Returns details about a job id as a JSON...
+  version  Prints the version of this application
+```
+
 ## `carto_dataset`
 
 This is still a work in progress...
 
-
-```bash
+```
 $ carto_dataset -h
 Usage: carto_dataset [OPTIONS] COMMAND [ARGS]...
 
@@ -132,7 +158,7 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  list_all  Display all your dataset names
-  version   Prints the version of this application
+  list     Display all your dataset names
+  version  Prints the version of this application
 ```
 
