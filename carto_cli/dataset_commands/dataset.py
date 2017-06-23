@@ -8,7 +8,7 @@ from prettytable import PrettyTable
 @click.option('-p','--pretty',default=False,is_flag=True, help="Formats only some relevant fields for easy reading")
 @click.help_option('-h', '--help')
 @click.pass_context
-def list_all(ctx,output,pretty):
+def list(ctx,output,pretty):
     carto_obj = ctx.obj['carto']
 
     sql = "select pg_class.relname from pg_class, pg_roles, pg_namespace where pg_roles.oid = pg_class.relowner and pg_roles.rolname = current_user and pg_namespace.oid = pg_class.relnamespace and pg_class.relkind = 'r'  order by relname"

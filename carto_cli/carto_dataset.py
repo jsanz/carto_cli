@@ -5,7 +5,7 @@ import yaml
 from .generic_commands.carto_user import CARTOUser
 from .generic_commands.version import version
 
-from .dataset_commands.list import list_all
+from .dataset_commands import dataset
 
 @click.group(help='Performs different actions against the SQL API')
 @click.option('-u','--user-name', envvar='CARTO_USER',
@@ -28,8 +28,7 @@ def cli(ctx, user_name, org_name, api_url, api_key):
     ctx.obj['carto'] = CARTOUser(user_name=user_name,org_name=org_name,api_url=api_url,api_key=api_key)
 
 cli.add_command(version)
-cli.add_command(list_all)
-
+cli.add_command(dataset.list)
 
 
 if __name__ == '__main__':
