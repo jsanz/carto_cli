@@ -19,7 +19,7 @@ def get_dataset(name, datasets):
             return dataset
 
 
-@click.command(help="Display all your CARTO dataset")
+@click.command(help="Display all your CARTO datasets")
 @click.option('-f', '--format', default="json", help="Format of your results",
               type=click.Choice(['json', 'csv', 'pretty']))
 @click.help_option('-h', '--help')
