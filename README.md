@@ -164,11 +164,12 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  indexes      Describes table indexes
-  list         Display all your dataset names
-  list_tables  List table and main database statistics
-  schema       Print the dataset schema
-  triggers     Describes table triggers
+  describe     Report of all your table details
+  indexes      List your table associated indexes
+  list         Display all your CARTO dataset
+  list_tables  List tables and their main Postgres...
+  schema       Shows your dataset attributes and types
+  triggers     List your table associated triggers
   version      Prints the version of this application
 ```
 
