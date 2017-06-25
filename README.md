@@ -159,7 +159,11 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  list     Display all your dataset names
-  version  Prints the version of this application
+  indexes      Describes table indexes
+  list         Display all your dataset names
+  list_tables  List table and main database statistics
+  schema       Print the dataset schema
+  triggers     Describes table triggers
+  version      Prints the version of this application
 ```
 

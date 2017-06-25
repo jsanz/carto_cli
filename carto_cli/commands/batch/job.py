@@ -2,6 +2,8 @@ import click
 import json
 import re
 
+from carto_cli.carto import queries
+
 
 @click.command(help="Display the ids of all your running jobs")
 @click.help_option('-h', '--help')
@@ -12,7 +14,7 @@ def list(ctx):
     leveraging that the JOB_ID is inside a comment
     '''
     carto_obj = ctx.obj['carto']
-    sql = 'select * from pg_stat_activity where usename=current_user'
+    sql = queries.CURRENT_RUNNING
     try:
         query = carto_obj.execute_sql(sql,format='json')
         regex = "\/\*\ ([0-9a-z]*-[0-9a-z]*-[0-9a-z]*-[0-9a-z]*-[0-9a-z]*)\ \*\/"

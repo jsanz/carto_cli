@@ -2,6 +2,9 @@ import click
 import json
 from prettytable import PrettyTable
 
+
+from carto_cli.carto import queries
+
 QUERY_FIELDS = [
     ('pid','pid'),
     ('state','State'),
@@ -19,7 +22,7 @@ QUERY_FIELDS = [
 @click.pass_context
 def queries(ctx,output,pretty):
     carto_obj = ctx.obj['carto']
-    sql = 'select * from pg_stat_activity where usename=current_user'
+    sql = queries.CURRENT_RUNNING
     try:
         query = carto_obj.execute_sql(sql,format='json')
 

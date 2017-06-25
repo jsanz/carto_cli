@@ -7,6 +7,7 @@ from .carto.version import version
 
 from .commands.dataset import dataset
 
+
 @click.group(help='Performs different actions against the SQL API')
 @click.option('-u','--user-name', envvar='CARTO_USER',
               help='Your CARTO.com user. It can be omitted if $CARTO_USER '+
@@ -29,6 +30,11 @@ def cli(ctx, user_name, org_name, api_url, api_key):
 
 cli.add_command(version)
 cli.add_command(dataset.list)
+cli.add_command(dataset.schema)
+cli.add_command(dataset.list_tables)
+cli.add_command(dataset.triggers)
+cli.add_command(dataset.indexes)
+cli.add_command(dataset.describe)
 
 
 if __name__ == '__main__':

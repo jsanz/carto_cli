@@ -1,8 +1,17 @@
 import click
 import json
+import csv
+
+from prettytable import PrettyTable
+from carto_cli.carto import queries
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 @click.command(help="Execute a SQL passed as a string")
-@click.option('-f','--format',default="csv",help="Format of your results",
+@click.option('-f','--format',default="json",help="Format of your results",
     type=click.Choice(['csv', 'shp','json','gpkg','geojson']))
 @click.option('-o','--output',type=click.File('wb'),
               help="Output file to generate instead of printing directly")
@@ -43,8 +52,7 @@ def run(ctx,format,output,explain,explain_analyze,sql):
 @click.pass_context
 def kill(ctx,pid):
     carto_obj = ctx.obj['carto']
-    sql = '''SELECT pg_cancel_backend({})
-from pg_stat_activity where usename=current_user;'''.format(pid)
+    sql = queries.KILL_QUERY.format(pid)
 
     try:
         result = carto_obj.execute_sql(sql)
@@ -56,7 +64,63 @@ from pg_stat_activity where usename=current_user;'''.format(pid)
             else:
                 ctx.fail('Invalid PID?')
         else:
-            ctx.fail("Error cancelling the query")
+            raise
     except Exception as e:
-        ctx.fail("Error executing your SQL: {}".format(e))
+        ctx.fail("Error cancelling the query: {}".format(e))
 
+
+
+@click.command(help="Functions on your account")
+@click.option('-f', '--format', default="json", help="Format of your results",
+              type=click.Choice(['json', 'csv', 'pretty']))
+@click.option('-n','--name', default=None,
+        help='Specify a function to get its definition')
+@click.help_option('-h', '--help')
+@click.pass_context
+def functions(ctx,format,name):
+    carto_obj = ctx.obj['carto']
+    sql = queries.FUNCTIONS
+    result = carto_obj.execute_sql(sql)
+
+    if format == 'json':
+        raw_result = json.dumps(result['rows'])
+    elif format == 'csv':
+        with StringIO() as csvfile:
+            fieldnames = queries.FUNCTIONS_HEADER
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for row in result['rows']:
+                arg_array = row['arguments']
+                if arg_array and len(arg_array) > 0:
+                    arg_str = ', '.join(arg_array)
+                else:
+                    arg_str = None
+
+                writer.writerow({
+                    'oid' : row['oid'],
+                    'name' : row['name'],
+                    'arguments': arg_str
+                })
+
+            raw_result = csvfile.getvalue()
+    else:
+        table_general = PrettyTable(queries.FUNCTIONS_HEADER)
+        table_general.align = "l"
+
+        #import ipdb; ipdb.set_trace()
+        for row in result['rows']:
+            pretty_row = []
+
+            arg_array = row['arguments']
+            if arg_array and len(arg_array) > 0:
+                row['arguments'] = ', '.join(arg_array)
+            else:
+                row['arguments'] = ''
+
+            for key in queries.FUNCTIONS_HEADER:
+                pretty_row.append(row[key])
+            table_general.add_row(pretty_row)
+
+        raw_result = table_general.get_string()
+
+    click.echo(raw_result, nl=format in ['json', 'pretty'])
