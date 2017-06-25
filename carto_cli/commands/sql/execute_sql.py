@@ -71,13 +71,12 @@ def kill(ctx,pid):
 
 
 @click.command(help="Functions on your account")
-@click.option('-f', '--format', default="json", help="Format of your results",
+@click.option('-f', '--format', default="json",
+              help="Format of your results (JSON output includes definition)",
               type=click.Choice(['json', 'csv', 'pretty']))
-@click.option('-n','--name', default=None,
-        help='Specify a function to get its definition')
 @click.help_option('-h', '--help')
 @click.pass_context
-def functions(ctx,format,name):
+def functions(ctx,format):
     carto_obj = ctx.obj['carto']
     sql = queries.FUNCTIONS
     result = carto_obj.execute_sql(sql)
@@ -120,6 +119,39 @@ def functions(ctx,format,name):
             for key in queries.FUNCTIONS_HEADER:
                 pretty_row.append(row[key])
             table_general.add_row(pretty_row)
+
+        raw_result = table_general.get_string()
+
+    click.echo(raw_result, nl=format in ['json', 'pretty'])
+
+
+@click.command(help="List your organization schemas")
+@click.option('-f', '--format', default="json", help="Format of your results",
+              type=click.Choice(['json', 'csv', 'pretty']))
+@click.help_option('-h', '--help')
+@click.pass_context
+def schemas(ctx,format):
+    carto_obj = ctx.obj['carto']
+    sql = queries.LIST_SCHEMAS
+    result = carto_obj.execute_sql(sql)
+
+    if format == 'json':
+        raw_result = json.dumps(result['rows'])
+    elif format == 'csv':
+        with StringIO() as csvfile:
+            fieldnames = ['user']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for row in result['rows']:
+                writer.writerow(row)
+            raw_result = csvfile.getvalue()
+    else:
+        table_general = PrettyTable(['user'])
+        table_general.align = "l"
+
+        #import ipdb; ipdb.set_trace()
+        for row in result['rows']:
+            table_general.add_row([row['user']])
 
         raw_result = table_general.get_string()
 

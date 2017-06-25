@@ -7,6 +7,13 @@ select pg_cancel_backend({})
  where usename=current_user
 '''
 
+LIST_SCHEMAS = '''
+select nspname as user
+  from pg_catalog.pg_namespace
+ where not nspowner = 10
+ order by nspname
+'''
+
 LIST_TABLES = '''
 select pg_class.relname as name,
        stats.relid,

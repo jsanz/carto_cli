@@ -6,9 +6,12 @@
 A simple set of command line applications to interact with your own CARTO account.
 
 
-* `carto_env`: load your credentials to interact with your account
-* `carto_sql`: perform queries against your SQL API
-* `carto_dataset`: manage your CARTO datasets
+* [`carto_env`](#carto_env): load your credentials to interact with your account
+* [`carto_sql`](#carto_sql): perform queries against the [SQL API](https://carto.com/docs/carto-engine/sql-api/)
+* [`carto_batch`](#carto_batch): perform queries using the [Batch SQL API](https://carto.com/docs/carto-engine/sql-api/batch-queries)
+* [`carto_dataset`](#carto_dataset): manage your CARTO datasets
+* [`carto_etl`](#carto_etl): TO DO
+* [`carto_map`](#carto_map): TO DO
 
 ## How-to's
 
@@ -22,7 +25,7 @@ You can fork the repo and set up your environment for development running `pip i
 
 From there you can make Pull Requests with any fix or improvement. When this is more mature I'll document how to contribute a new subcommand but you can actually take a look to the `setup.py` file and then any of the scripts of the different folders.
 
-## A note about environment variables
+### A note about environment variables
 
 All the tools here use by default some environment variables. If you only manage one single CARTO account then you can set them in any initialization script that your environment uses like `~/.bashrc` or `/etc/environment` with these variables:
 
@@ -62,9 +65,9 @@ So if you have the `$CARTO_ENV` environment pointing for example to `/tmp/cartoe
 $ carto_env load jsanz; c
 ```
 
-### YAML file
+### Configuration file
 
-Store a file named (by default) `~/.cartorc.yaml` with this structure
+Store a `yaml` file named (by default) `~/.cartorc.yaml` with this structure
 
 ```yaml
 ---
@@ -102,10 +105,12 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  kill     Kills a query based on its pid
-  queries  Shows the current running queries
-  run      Execute a SQL passed as a string
-  version  Prints the version of this application
+  functions  Functions on your account
+  kill       Kills a query based on its pid
+  queries    Shows the current running queries
+  run        Execute a SQL passed as a string
+  schemas    List your organization schemas
+  version    Prints the version of this application
 ```
 
 Check for details on each command as they have especific options.
@@ -167,3 +172,11 @@ Commands:
   version      Prints the version of this application
 ```
 
+
+## `carto_etl`
+
+Import/export datasets
+
+## `carto_map`
+
+Manage your maps

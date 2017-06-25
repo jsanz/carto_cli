@@ -34,6 +34,7 @@ cli.add_command(queries)
 cli.add_command(execute_sql.run)
 cli.add_command(execute_sql.kill)
 cli.add_command(execute_sql.functions)
+cli.add_command(execute_sql.schemas)
 
 
 

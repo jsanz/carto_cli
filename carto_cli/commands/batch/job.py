@@ -27,7 +27,7 @@ def list(ctx):
 
 
 
-@click.command(help="Returns details about a job id as a JSON output")
+@click.command(help="Returns details about a job id (JSON)")
 @click.argument('job_id')
 @click.help_option('-h', '--help')
 @click.pass_context
