@@ -2,11 +2,11 @@ import click
 import os.path
 import yaml
 
-from .generic_commands.carto_user import CARTOUser
-from .generic_commands.version import version
+from .carto.carto_user import CARTOUser
+from .carto.version import version
 
 
-from .batch_commands import job
+from .commands.batch import job
 
 @click.group(help='Performs different actions against the Batch SQL API')
 @click.option('-u','--user-name', envvar='CARTO_USER',

@@ -11,7 +11,7 @@ import json
 @click.help_option('-h', '--help')
 @click.argument('sql', nargs=-1)
 @click.pass_context
-def execute(ctx,format,output,explain,explain_analyze,sql):
+def run(ctx,format,output,explain,explain_analyze,sql):
     carto_obj = ctx.obj['carto']
     sql = ' '.join(sql)
     try:

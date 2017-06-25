@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
-from carto_cli.generic_commands.version import CARTO_CLI_VERSION
+from carto_cli.carto.version import CARTO_CLI_VERSION
 import os
 
 # Utility function to read the README file.

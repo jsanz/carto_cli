@@ -2,7 +2,7 @@ import click
 import os.path
 import yaml
 
-from .generic_commands.version import version
+from .carto.version import version
 
 default_config_file = os.environ.get(
     'CARTO_DB', os.path.join(os.path.expanduser("~"), '.cartorc.yaml'))

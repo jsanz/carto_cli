@@ -102,8 +102,9 @@ Options:
   -h, --help            Show this message and exit.
 
 Commands:
-  execute  Execute a SQL passed as a string
+  kill     Kills a query based on its pid
   queries  Shows the current running queries
+  run      Execute a SQL passed as a string
   version  Prints the version of this application
 ```
 

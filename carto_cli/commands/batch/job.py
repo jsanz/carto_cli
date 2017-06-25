@@ -34,10 +34,11 @@ def read(ctx,job_id):
     Just returns the details of a job using as a JSON
     '''
     carto_obj = ctx.obj['carto']
-
-    job_details = carto_obj.batch_check(job_id)
-
-    click.echo(json.dumps(job_details))
+    try:
+        job_details = carto_obj.batch_check(job_id)
+        click.echo(json.dumps(job_details))
+    except Exception as e:
+        ctx.fail(e)
 
 
 

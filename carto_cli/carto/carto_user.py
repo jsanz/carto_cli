@@ -42,31 +42,22 @@ class CARTOUser(object):
 
     def batch_check(self,job_id):
         try:
-            try:
-                self.client
-            except AttributeError:
-                self.initialize()
-            return self.batch_client.read(job_id)
-        except CartoException as e:
-            raise Exception(e.args[0].args[0][0])
+            self.client
+        except AttributeError:
+            self.initialize()
+        return self.batch_client.read(job_id)
 
     def batch_create(self,query):
         try:
-            try:
-                self.client
-            except AttributeError:
-                self.initialize()
-            return self.batch_client.create(query)
-        except CartoException as e:
-            raise Exception(e.args[0].args[0][0])
+            self.client
+        except AttributeError:
+            self.initialize()
+        return self.batch_client.create(query)
 
     def batch_cancel(self,job_id):
         try:
-            try:
-                self.client
-            except AttributeError:
-                self.initialize()
-            return self.batch_client.cancel(job_id)
-        except CartoException as e:
-            raise Exception(e.args[0].args[0][0])
+            self.client
+        except AttributeError:
+            self.initialize()
+        return self.batch_client.cancel(job_id)
 

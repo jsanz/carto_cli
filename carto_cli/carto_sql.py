@@ -2,12 +2,12 @@ import click
 import os.path
 import yaml
 
-from .generic_commands.carto_user import CARTOUser
-from .generic_commands.version import version
+from .carto.carto_user import CARTOUser
+from .carto.version import version
 
-from .sql_commands.execute_sql import execute
-from .sql_commands.execute_sql import kill
-from .sql_commands.running_queries import queries
+from .commands.sql.execute_sql import run
+from .commands.sql.execute_sql import kill
+from .commands.sql.running_queries import queries
 
 
 @click.group(help='Performs different actions against the SQL API')
@@ -31,7 +31,7 @@ def cli(ctx, user_name, org_name, api_url, api_key):
     ctx.obj['carto'] = CARTOUser(user_name=user_name,org_name=org_name,api_url=api_url,api_key=api_key)
 
 cli.add_command(version)
-cli.add_command(execute)
+cli.add_command(run)
 cli.add_command(kill)
 cli.add_command(queries)
 
