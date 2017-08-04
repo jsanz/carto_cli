@@ -21,12 +21,19 @@ from .commands.dataset import dataset
 @click.option('-k','--api-key', envvar='CARTO_API_KEY',
               help='It can be omitted if $CARTO_API_KEY ' +
               'is available')
+@click.option('-c','--check-ssl', default=True,envvar='CARTO_CHECK_SSL', type=bool,
+              help='Check server SSL Certificate (default = True or CARTO_CHECK_SSL envvar)')
 @click.help_option('-h', '--help')
 @click.pass_context
-def cli(ctx, user_name, org_name, api_url, api_key):
+def cli(ctx, user_name, org_name, api_url, api_key,check_ssl):
     if not ctx.obj:
       ctx.obj = {}
-    ctx.obj['carto'] = CARTOUser(user_name=user_name,org_name=org_name,api_url=api_url,api_key=api_key)
+    ctx.obj['carto'] = CARTOUser(
+      user_name=user_name,
+      org_name=org_name,
+      api_url=api_url,
+      api_key=api_key,
+      check_ssl=check_ssl)
 
 cli.add_command(version)
 cli.add_command(dataset.list)
@@ -35,6 +42,11 @@ cli.add_command(dataset.list_tables)
 cli.add_command(dataset.triggers)
 cli.add_command(dataset.indexes)
 cli.add_command(dataset.describe)
+cli.add_command(dataset.export)
+cli.add_command(dataset.import_dataset)
+cli.add_command(dataset.delete)
+cli.add_command(dataset.merge)
+cli.add_command(dataset.cartodbfy)
 
 
 if __name__ == '__main__':

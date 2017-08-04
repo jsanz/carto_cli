@@ -94,15 +94,17 @@ Usage: carto_sql [OPTIONS] COMMAND [ARGS]...
   Performs different actions against the SQL API
 
 Options:
-  -u, --user-name TEXT  Your CARTO.com user. It can be omitted if $CARTO_USER
-                        is available
-  -o, --org-name TEXT   Your organization name. It can be ommitted if
-                        $CARTO_ORG is available
-  -a, --api-url TEXT    If you are not using carto.com you need to specify
-                        your API endpoint. It can be omitted if $CARTO_API_URL
-                        is available
-  -k, --api-key TEXT    It can be omitted if $CARTO_API_KEY is available
-  -h, --help            Show this message and exit.
+  -u, --user-name TEXT     Your CARTO.com user. It can be omitted if
+                           $CARTO_USER is available
+  -o, --org-name TEXT      Your organization name. It can be ommitted if
+                           $CARTO_ORG is available
+  -a, --api-url TEXT       If you are not using carto.com you need to specify
+                           your API endpoint. It can be omitted if
+                           $CARTO_API_URL is available
+  -k, --api-key TEXT       It can be omitted if $CARTO_API_KEY is available
+  -c, --check-ssl BOOLEAN  Check server SSL Certificate (default = True or
+                           CARTO_CHECK_SSL envvar)
+  -h, --help               Show this message and exit.
 
 Commands:
   functions  Functions on your account
@@ -124,27 +126,31 @@ Usage: carto_batch [OPTIONS] COMMAND [ARGS]...
   Performs different actions against the Batch SQL API
 
 Options:
-  -u, --user-name TEXT  Your CARTO.com user. It can be omitted if $CARTO_USER
-                        is available
-  -o, --org-name TEXT   Your organization name. It can be ommitted if
-                        $CARTO_ORG is available
-  -a, --api-url TEXT    If you are not using carto.com you need to specify
-                        your API endpoint. It can be omitted if $CARTO_API_URL
-                        is available
-  -k, --api-key TEXT    It can be omitted if $CARTO_API_KEY is available
-  -h, --help            Show this message and exit.
+  -u, --user-name TEXT     Your CARTO.com user. It can be omitted if
+                           $CARTO_USER is available
+  -o, --org-name TEXT      Your organization name. It can be ommitted if
+                           $CARTO_ORG is available
+  -a, --api-url TEXT       If you are not using carto.com you need to specify
+                           your API endpoint. It can be omitted if
+                           $CARTO_API_URL is available
+  -k, --api-key TEXT       It can be omitted if $CARTO_API_KEY is available
+  -c, --check-ssl BOOLEAN  Check server SSL Certificate (default = True or
+                           CARTO_CHECK_SSL envvar)
+  -h, --help               Show this message and exit.
 
 Commands:
   cancel   Cancels a job
   create   Creates a new job and returns its ID
   list     Display the ids of all your running jobs
-  read     Returns details about a job id as a JSON...
+  read     Returns details about a job id (JSON)
   version  Prints the version of this application
 ```
 
 ## `carto_dataset`
 
-This is still a work in progress...
+Command to work with your account datasets, get information from them, upload and
+download data, etc.
+
 
 ```
 $ carto_dataset -h
@@ -153,30 +159,33 @@ Usage: carto_dataset [OPTIONS] COMMAND [ARGS]...
   Performs different actions against the SQL API
 
 Options:
-  -u, --user-name TEXT  Your CARTO.com user. It can be omitted if $CARTO_USER
-                        is available
-  -o, --org-name TEXT   Your organization name. It can be ommitted if
-                        $CARTO_ORG is available
-  -a, --api-url TEXT    If you are not using carto.com you need to specify
-                        your API endpoint. It can be omitted if $CARTO_API_URL
-                        is available
-  -k, --api-key TEXT    It can be omitted if $CARTO_API_KEY is available
-  -h, --help            Show this message and exit.
+  -u, --user-name TEXT     Your CARTO.com user. It can be omitted if
+                           $CARTO_USER is available
+  -o, --org-name TEXT      Your organization name. It can be ommitted if
+                           $CARTO_ORG is available
+  -a, --api-url TEXT       If you are not using carto.com you need to specify
+                           your API endpoint. It can be omitted if
+                           $CARTO_API_URL is available
+  -k, --api-key TEXT       It can be omitted if $CARTO_API_KEY is available
+  -c, --check-ssl BOOLEAN  Check server SSL Certificate (default = True or
+                           CARTO_CHECK_SSL envvar)
+  -h, --help               Show this message and exit.
 
 Commands:
-  describe     Report of all your table details
-  indexes      List your table associated indexes
-  list         Display all your CARTO dataset
-  list_tables  List tables and their main Postgres...
-  schema       Shows your dataset attributes and types
-  triggers     List your table associated triggers
-  version      Prints the version of this application
+  cartodbfy       Runs the cartodbfication of a table to...
+  delete          Deletes a dataset from your account
+  describe        Report of all your table details
+  export          Export your dataset
+  import_dataset  Import a new dataset from a file on your...
+  indexes         List your table associated indexes
+  list            Display all your CARTO datasets
+  list_tables     List tables and their main Postgres...
+  merge           Merges a number of datasets
+  schema          Shows your dataset attributes and types
+  triggers        List your table associated triggers
+  version         Prints the version of this application
 ```
 
-
-## `carto_etl`
-
-Import/export datasets
 
 ## `carto_map`
 

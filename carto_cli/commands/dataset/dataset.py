@@ -2,9 +2,12 @@ import click
 import json
 import warnings
 import csv
+import os
+import time
 
 from prettytable import PrettyTable
 from carto_cli.carto import queries
+from carto_cli.commands.sql.execute_sql import run as run_sql
 
 try:
     from StringIO import StringIO
@@ -13,10 +16,28 @@ except ImportError:
 
 warnings.filterwarnings('ignore')
 
+SPLIT_EXPORT = int(os.environ.get("CARTO_SPLIT_EXPORT", 1000000))
+
+def prettyMBprint(value):
+    try:
+        size = int(value) / (1024.0*1024)
+        return "{:.2f} MB".format(size)
+    except Exception as e:
+        return value
+
+def prettyIntPrint(value):
+    return "{:,}".format(value)
+
 def get_dataset(name, datasets):
     for dataset in datasets:
         if dataset.name == name:
             return dataset
+
+def get_cartodbfy_query(user,org,table_name):
+    if org:
+        return 'SELECT CDB_CartoDBfyTable(\'{}\',\'{}\')'.format(user,table_name)
+    else:
+        return 'SELECT CDB_CartoDBfyTable(\'{}\')'.format(table_name)
 
 
 @click.command(help="Display all your CARTO datasets")
@@ -71,19 +92,13 @@ def list(ctx, format):
             table_general.align['Tags'] = "l"
 
             for row in results:
-                if row['size']:
-                    row_size_val = int(row['size']) / (1024.0*1024)
-                    row_size = "{:.2f} MB".format(row_size_val)
-                else:
-                    row_size = row['size']
-
                 table_general.add_row([
                     row['name'],
                     row['privacy'],
                     row['locked'],
                     row['likes'],
-                    row_size_val,
-                    row['row_count'],
+                    prettyMBprint(row['size']),
+                    prettyIntPrint(row['row_count']),
                     ", ".join(row['tags'])
                 ])
 
@@ -276,8 +291,8 @@ def describe(ctx, refresh, table_name):
             table_general.align = "l"
 
             table_general.add_row(['name', dataset.name])
-            table_general.add_row(['row_count', dataset.table.row_count])
-            table_general.add_row(['size', dataset.table.size])
+            table_general.add_row(['row_count', "{:,}".format(dataset.table.row_count)])
+            table_general.add_row(['size', prettyMBprint(dataset.table.size)])
             table_general.add_row(['likes', dataset.likes])
             table_general.add_row(['locked', dataset.locked])
             table_general.add_row(['privacy', dataset.privacy])
@@ -298,3 +313,166 @@ def describe(ctx, refresh, table_name):
     click.echo('\r\n## Triggers\r\n')
     ctx.invoke(triggers, format = 'pretty', table_name = table_name)
 
+
+
+@click.command(help="Export your dataset")
+@click.help_option('-h', '--help')
+@click.option('-f','--format',default="gpkg",help="Format of your results",
+    type=click.Choice(['gpkg','csv', 'shp','geojson']))
+@click.option('-o','--output',type=click.File('wb'),
+              help="Output file to generate instead of printing directly")
+@click.argument('table_name')
+@click.pass_context
+def export(ctx, format, output, table_name):
+    carto_obj = ctx.obj['carto']
+    if not output:
+        output = open('{}.{}'.format(table_name,format), 'wb')
+
+    # Check table size
+    sql = "select count(*) from {}".format(table_name)
+    result = carto_obj.execute_sql(sql)
+    counts = int(result['rows'][0]['count'])
+
+    if counts > SPLIT_EXPORT:
+        click.echo("Table is too big, we need to download it in chunks")
+        ind = 1
+        base, ext = os.path.splitext(output.name)
+        for i in range(1,counts,SPLIT_EXPORT):
+            sql = '''
+                    select * from {table_name}
+                  order by cartodb_id
+                     limit {limit} offset {offset}
+                  '''.format(
+                        table_name = table_name,
+                        limit = SPLIT_EXPORT,
+                        offset = i)
+            output = open('{}_{}{}'.format(base,ind,ext),'wb')
+            ctx.invoke(run_sql,
+                format = format,
+                output = output ,
+                explain = False,
+                explain_analyze = False,
+                sql = sql)
+
+            click.echo("Chunk {} exported to {}".format(ind,output.name))
+            ind = ind + 1
+
+    else:
+        ctx.invoke(run_sql,
+            format = format,
+            output = output,
+            explain = False,
+            explain_analyze = False,
+            sql = "select * from {}".format(table_name))
+        click.echo("Table {} exported to {}".format(table_name,output.name))
+
+
+
+@click.command(help="Import a new dataset from a file on your computer")
+@click.help_option('-h', '--help')
+@click.option('-s','--sync',default=None,help="Seconds between sync updates",
+    type=int)
+@click.argument('path')
+@click.pass_context
+def import_dataset(ctx, sync, path):
+    carto_obj = ctx.obj['carto']
+
+    # Check the resource
+    if path[:4] == 'http':
+        sync_manager = carto_obj.get_sync_manager()
+        if sync:
+            task = sync_manager.create(path,sync)
+            click.echo("You can safely abort now if you don't want to wait for the import to finish")
+
+            # Check the import
+            sync_id = task.get_id()
+            while(task.state != 'success'):
+                time.sleep(5)
+                click.echo("Checking status of the import...")
+                task.refresh()
+                if (task.state == 'failure'):
+                    print('The error code is: ' + str(task.error_code))
+                    print('The error message is: ' + str(task.error_message))
+                    break
+            click.echo("Dataset imported!")
+        else:
+            task = carto_obj.import_dataset(path)
+
+
+    elif os.path.exists(path):
+        task = carto_obj.import_dataset(path)
+        click.echo("Local resource uploaded!")
+    else:
+        ctx.fail("The resource provided is not a valid URL or an existing file")
+
+
+@click.command(help="Deletes a dataset from your account")
+@click.help_option('-h', '--help')
+@click.argument('table_name')
+@click.pass_context
+def delete(ctx, table_name):
+    carto_obj = ctx.obj['carto']
+    dataset_manager = carto_obj.get_dataset_manager();
+    dataset = dataset_manager.get(table_name)
+    if dataset:
+        dataset.delete()
+        click.echo("Dataset deleted!")
+
+
+
+@click.command(help="Merges a number of datasets")
+@click.help_option('-h', '--help')
+@click.argument('table_name_prefix')
+@click.argument('new_table_name')
+@click.pass_context
+def merge(ctx, table_name_prefix,new_table_name):
+    carto_obj = ctx.obj['carto']
+    # get the list of tables
+    sql = queries.LIST_TABLES.format(schema_name=carto_obj.user_name,table_name='{}%'.format(table_name_prefix))
+    result = carto_obj.execute_sql(sql)
+    tables = [row['name'] for row in result['rows']]
+
+    click.echo("Tables to merge:")
+    for table in tables:
+        click.echo("\t{}".format(table))
+
+
+    # get the list of columns from the first table
+    sql = queries.SCHEMA.format(table_name=tables[0])
+    result = carto_obj.execute_sql(sql)
+    columns = ",".join([row['attribute'] for row in result['rows'] if row['attribute'] != 'cartodb_id'])
+
+    # build the list of queries
+    query_list = [
+        'CREATE TABLE {} AS SELECT {} FROM {}'.format(new_table_name,columns,tables[0]),
+    ];
+    for table in tables[1:]:
+        query_list.append('''INSERT INTO {first_table} SELECT {columns} FROM {table}'''.format(
+                first_table = new_table_name,
+                columns = columns,
+                table = table
+            ))
+
+    # add cartodbfication of the new table
+    query_list.append(get_cartodbfy_query(org=carto_obj.org_name,
+        user=carto_obj.user_name,
+        table_name = new_table_name))
+
+    # start a batch sql api job
+    job_details = carto_obj.batch_create(query_list)
+    click.echo("Batch SQL API job launched to merge all tables")
+    click.echo(job_details['job_id'])
+
+@click.command(help="Runs the cartodbfication of a table to convert it into a dataset")
+@click.help_option('-h', '--help')
+@click.argument('table_name')
+@click.pass_context
+def cartodbfy(ctx, table_name):
+    carto_obj = ctx.obj['carto']
+    job_details = carto_obj.batch_create(get_cartodbfy_query(
+        org=carto_obj.org_name,
+        user=carto_obj.user_name,
+        table_name = table_name
+        ))
+    click.echo("Batch SQL API job launched to cartodbfy the table")
+    click.echo(job_details['job_id'])
