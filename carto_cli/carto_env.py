@@ -76,12 +76,17 @@ def load(ctx, output_file, user):
             url = 'https://{}.carto.com/'.format(user)
 
         result = '''
- export CARTO_USER="{user}"\n
- export CARTO_API_KEY="{api_key}"\n
- export CARTO_API_URL="{url}"\n'''.format(user=user, org=org, api_key=api_key, url=url)
+export CARTO_USER="{user}"
+export CARTO_API_KEY="{api_key}"
+export CARTO_API_URL="{url}"'''.format(user=user, org=org, api_key=api_key, url=url)
 
         if org != None:
-            result = result + '\n export CARTO_ORG="{org}"\n'.format(org=org)
+            result = result + '\nexport CARTO_ORG="{org}"'.format(org=org)
+
+        if 'check_ssl' in user_config:
+            result = result + '\nexport CARTO_CHECK_SSL="{}"'.format(user_config['check_ssl'])
+
+        result = result + '\n'
 
         if output_file:
             output_file.write(result)
