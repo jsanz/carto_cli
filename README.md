@@ -10,7 +10,6 @@ A simple set of command line applications to interact with your own CARTO accoun
 * [`carto_sql`](#carto_sql): perform queries against the [SQL API](https://carto.com/docs/carto-engine/sql-api/)
 * [`carto_batch`](#carto_batch): perform queries using the [Batch SQL API](https://carto.com/docs/carto-engine/sql-api/batch-queries)
 * [`carto_dataset`](#carto_dataset): manage your CARTO datasets
-* [`carto_etl`](#carto_etl): TO DO
 * [`carto_map`](#carto_map): TO DO
 
 ## How-to's
@@ -32,7 +31,8 @@ All the tools here use by default some environment variables. If you only manage
  - `CARTO_USER`: you user name
  - `CARTO_ORG`: the name of your CARTO organization if you use the Open Source or an Enterprise account
  - `CARTO_API_KEY`: your API key to interact with CARTO Engine
- - `CARTO_API_URL`: if you don't use a carto.com account you need to put here the equivalent to the API end point. For a carto.com account it would be `http://user.carto.com/`
+ - `CARTO_API_URL`: if you don't use a `carto.com` account you need to put here the equivalent to the API end point. For a `carto.com` account it would be `http://user.carto.com/`
+ - `CARTO_CHECK_SSL`: if you are using your own server and don't have a proper certificate installed set this variable to `false`
 
 Setting up those variables will save you having to put them on any call to the command line applications, saving you a lot of Copy&Paste work.
 
