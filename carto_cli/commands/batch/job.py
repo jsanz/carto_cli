@@ -53,7 +53,8 @@ def create(ctx,sql):
     Creates a new job and returns it's ID
     '''
     carto_obj = ctx.obj['carto']
-    sql = ' '.join(sql)
+    if type(sql) == tuple:
+        sql = ' '.join(sql)
 
     job_details = carto_obj.batch_create(sql)
 

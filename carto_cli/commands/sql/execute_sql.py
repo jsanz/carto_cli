@@ -22,7 +22,8 @@ except ImportError:
 @click.pass_context
 def run(ctx,format,output,explain,explain_analyze,sql):
     carto_obj = ctx.obj['carto']
-    sql = ' '.join(sql)
+    if type(sql) == tuple:
+        sql = ' '.join(sql)
     try:
         if explain:
             sql = "EXPLAIN " + sql
@@ -30,7 +31,6 @@ def run(ctx,format,output,explain,explain_analyze,sql):
         elif explain_analyze:
             sql = "EXPLAIN ANALYZE " + sql
             format = 'json'
-
         result = carto_obj.execute_sql(sql,format=format,do_post=True)
 
         if explain or explain_analyze:
