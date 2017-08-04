@@ -9,6 +9,8 @@ from prettytable import PrettyTable
 from carto_cli.carto import queries
 from carto_cli.commands.sql.execute_sql import run as run_sql
 
+from carto.permissions import PRIVATE, PUBLIC, LINK
+
 try:
     from StringIO import StringIO
 except ImportError:
@@ -417,6 +419,67 @@ def delete(ctx, table_name):
     if dataset:
         dataset.delete()
         click.echo("Dataset deleted!")
+    else:
+        ctx.fail('The dataset does not exist!')
+
+
+@click.command(help="Edit dataset properties")
+@click.help_option('-h', '--help')
+@click.option('-d', '--description', help="Add a meaninful description to your tables",
+    type=str)
+@click.option('-p', '--privacy', help="Set the privacy of your dataset",
+    type=click.Choice(['PRIVATE','LINK','PUBLIC'])
+    )
+@click.option('-c', '--locked', help="Lock your dataset",default= None, type=bool)
+@click.option('-l', '--license', help="Set your dataset license")
+@click.option('-a', '--attributions', help="Set your dataset attributions")
+@click.option('-t', '--tags', help="Set your dataset tags, use commas to separate them")
+@click.argument('dataset_name')
+@click.pass_context
+def edit(ctx, description, privacy, locked, license, attributions, tags, dataset_name):
+    carto_obj = ctx.obj['carto']
+    dataset_manager = carto_obj.get_dataset_manager()
+    try:
+        dataset = dataset_manager.get(dataset_name)
+        import ipdb; ipdb.set_trace()
+        if privacy:
+            if privacy == 'PRIVATE':
+                dataset.privacy = PRIVATE
+            elif privacy == 'LINK':
+                dataset.privacy = LINK
+            elif privacy == 'PUBLIC':
+                dataset.privacy = PUBLIC
+        if locked is not None:
+            dataset.locked = locked
+        if description:
+            dataset.description = description
+        if license:
+            dataset.license = license
+        if attributions:
+            dataset.attributions = attributions
+        if tags:
+            dataset.tags = tags.split(',')
+
+        dataset.save()
+        click.echo("Dataset edited!")
+    except:
+        ctx.fail('The dataset does not exist!')
+
+@click.command(help="Renames a dataset from your account")
+@click.help_option('-h', '--help')
+@click.argument('old')
+@click.argument('new')
+@click.pass_context
+def rename(ctx, old, new):
+    carto_obj = ctx.obj['carto']
+    dataset_manager = carto_obj.get_dataset_manager();
+    dataset = dataset_manager.get(old)
+    if dataset:
+        dataset.name = new
+        dataset.save()
+        click.echo("Dataset renamed!")
+    else:
+        ctx.fail('The dataset does not exist!')
 
 
 

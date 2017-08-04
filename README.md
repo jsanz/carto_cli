@@ -175,15 +175,18 @@ Commands:
   cartodbfy       Runs the cartodbfication of a table to...
   delete          Deletes a dataset from your account
   describe        Report of all your table details
+  edit            Edit dataset properties
   export          Export your dataset
   import_dataset  Import a new dataset from a file on your...
   indexes         List your table associated indexes
   list            Display all your CARTO datasets
   list_tables     List tables and their main Postgres...
   merge           Merges a number of datasets
+  rename          Renames a dataset from your account
   schema          Shows your dataset attributes and types
   triggers        List your table associated triggers
   version         Prints the version of this application
+
 ```
 
 

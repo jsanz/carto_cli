@@ -45,6 +45,8 @@ cli.add_command(dataset.describe)
 cli.add_command(dataset.export)
 cli.add_command(dataset.import_dataset)
 cli.add_command(dataset.delete)
+cli.add_command(dataset.rename)
+cli.add_command(dataset.edit)
 cli.add_command(dataset.merge)
 cli.add_command(dataset.cartodbfy)
 
