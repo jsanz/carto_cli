@@ -3,16 +3,39 @@ from carto.sql import SQLClient
 from carto.sql import BatchSQLClient
 from carto.auth import APIKeyAuthClient
 from carto.datasets import DatasetManager
+from carto.sync_tables import SyncTableJobManager
+
+import warnings
+import requests
+import contextlib
+
+try:
+    from functools import partialmethod
+except ImportError:
+    # Python 2 fallback: https://gist.github.com/carymrobbins/8940382
+    from functools import partial
+
+    class partialmethod(partial):
+        def __get__(self, instance, owner):
+            if instance is None:
+                return self
+
+            return partial(self.func, instance, *(self.args or ()), **(self.keywords or {}))
 
 
 class CARTOUser(object):
 
     def __init__(self, user_name=None, org_name=None,
-                 api_url=None, api_key=None):
+                 api_url=None, api_key=None, check_ssl=True):
         self.user_name = user_name
         self.org_name = org_name
         self.api_url = api_url
         self.api_key = api_key
+
+        if not check_ssl:
+            old_request = requests.Session.request
+            requests.Session.request = partialmethod(old_request, verify=False)
+            warnings.filterwarnings('ignore', 'Unverified HTTPS request')
 
     def initialize(self):
         if not self.api_url and self.user_name:
@@ -29,7 +52,6 @@ class CARTOUser(object):
 
         self.sql_client = SQLClient(self.client)
         self.batch_client = BatchSQLClient(self.client)
-        self.dataset_manager = DatasetManager(self.client)
 
     def execute_sql(self, query, parse_json=True, format=None, do_post=False):
         try:
@@ -65,7 +87,28 @@ class CARTOUser(object):
 
     def get_dataset_manager(self):
         try:
-            self.dataset_manager
+            self.sql_client
         except AttributeError:
             self.initialize()
-        return self.dataset_manager
+        return DatasetManager(self.client)
+
+
+    def get_sync_manager(self):
+        try:
+            self.sql_client
+        except AttributeError:
+            self.initialize()
+        return SyncTableJobManager(self.client)
+
+    def import_dataset(self,uri,sync_time=None):
+        try:
+            self.sql_client
+        except AttributeError:
+            self.initialize()
+
+        dataset_manager = DatasetManager(self.client)
+
+        if sync_time:
+            return dataset_manager.create(uri, sync_time)
+        else:
+            return dataset_manager.create(uri)
