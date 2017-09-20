@@ -3,7 +3,7 @@ import json
 from prettytable import PrettyTable
 
 
-from carto_cli.carto import queries
+from carto_cli.carto import queries as carto_queries
 
 QUERY_FIELDS = [
     ('pid','pid'),
@@ -22,7 +22,7 @@ QUERY_FIELDS = [
 @click.pass_context
 def queries(ctx,output,pretty):
     carto_obj = ctx.obj['carto']
-    sql = queries.CURRENT_RUNNING
+    sql = carto_queries.CURRENT_RUNNING
     try:
         query = carto_obj.execute_sql(sql,format='json')
 
