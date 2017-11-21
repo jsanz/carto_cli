@@ -18,7 +18,7 @@ except ImportError:
 
 warnings.filterwarnings('ignore')
 
-SPLIT_EXPORT = int(os.environ.get("CARTO_SPLIT_EXPORT", 1000000))
+SPLIT_EXPORT = int(os.environ.get("CARTO_SPLIT_EXPORT", 500000))
 
 def prettyMBprint(value):
     try:
@@ -118,7 +118,13 @@ def list(ctx, format):
 @click.pass_context
 def list_tables(ctx, format):
     carto_obj = ctx.obj['carto']
-    sql = queries.LIST_TABLES.format(schema_name=carto_obj.user_name,table_name='%')
+
+    if carto_obj.org_name:
+        schema_name = carto_obj.user_name
+    else:
+        schema_name = 'public'
+
+    sql = queries.LIST_TABLES.format(schema_name=schema_name,table_name='%')
     result = carto_obj.execute_sql(sql)
 
     if format == 'json':
