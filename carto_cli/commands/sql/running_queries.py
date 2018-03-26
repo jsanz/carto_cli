@@ -8,7 +8,6 @@ from carto_cli.carto import queries as carto_queries
 QUERY_FIELDS = [
     ('pid','pid'),
     ('state','State'),
-    ('waiting','Waiting'),
     ('query_start','Query start'),
     ('application_name','Application'),
     ('query','Query')

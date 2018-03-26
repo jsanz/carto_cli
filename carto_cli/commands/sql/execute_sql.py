@@ -17,10 +17,11 @@ except ImportError:
               help="Output file to generate instead of printing directly")
 @click.option('-e','--explain',is_flag=True,default=False,help="Explains the query")
 @click.option('-ea','--explain-analyze',is_flag=True,default=False,help="Explains the query executing it")
+@click.option('-eaj','--explain-analyze-json',is_flag=True,default=False,help="Explains the query executing it and return as a JSON")
 @click.help_option('-h', '--help')
 @click.argument('sql', nargs=-1)
 @click.pass_context
-def run(ctx,format,output,explain,explain_analyze,sql):
+def run(ctx,format,output,explain,explain_analyze,explain_analyze_json,sql):
     carto_obj = ctx.obj['carto']
     if type(sql) == tuple:
         sql = ' '.join(sql)
@@ -31,10 +32,16 @@ def run(ctx,format,output,explain,explain_analyze,sql):
         elif explain_analyze:
             sql = "EXPLAIN ANALYZE " + sql
             format = 'json'
+        elif explain_analyze_json:
+            sql = "EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON) " + sql
+            format = 'json'
+
         result = carto_obj.execute_sql(sql,format=format,do_post=True)
 
         if explain or explain_analyze:
             result = '\r\n'.join([row['QUERY PLAN'] for row in result['rows']])
+        elif explain_analyze_json:
+            result = json.dumps(result['rows'][0]['QUERY PLAN'])
         elif format in ['json','geojson']:
             result = json.dumps(result)
 

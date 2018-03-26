@@ -1,4 +1,4 @@
-carto==1.0.1
+carto==1.1.2
 click==6.7
 PyYAML==3.12
 prettytable==0.7.2
