@@ -100,7 +100,7 @@ class CARTOUser(object):
             self.initialize()
         return SyncTableJobManager(self.client)
 
-    def import_dataset(self,uri,sync_time=None):
+    def upload(self,uri,sync_time=None):
         try:
             self.sql_client
         except AttributeError:

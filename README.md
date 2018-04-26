@@ -3,6 +3,12 @@
 
 **WORK IN PROGRESS**
 
+## TO-DO
+
+* Finish visualization and named maps interactions
+* Set up defaults system for formats and a default account
+
+
 A simple set of command line applications to interact with your own CARTO account.
 
 
@@ -172,20 +178,20 @@ Options:
   -h, --help               Show this message and exit.
 
 Commands:
-  cartodbfy       Runs the cartodbfication of a table to...
-  delete          Deletes a dataset from your account
-  describe        Report of all your table details
-  edit            Edit dataset properties
-  export          Export your dataset
-  import_dataset  Import a new dataset from a file on your...
-  indexes         List your table associated indexes
-  list            Display all your CARTO datasets
-  list_tables     List tables and their main Postgres...
-  merge           Merges a number of datasets
-  rename          Renames a dataset from your account
-  schema          Shows your dataset attributes and types
-  triggers        List your table associated triggers
-  version         Prints the version of this application
+  cartodbfy    Runs the cartodbfication of a table to...
+  delete       Deletes a dataset from your account
+  describe     Report of all your table details
+  download     Download a dataset
+  edit         Edit dataset properties
+  indexes      List your table associated indexes
+  list         Display all your CARTO datasets
+  list_tables  List tables and their main Postgres...
+  merge        Merges a number of datasets
+  rename       Renames a dataset from your account
+  schema       Shows your dataset attributes and types
+  triggers     List your table associated triggers
+  upload       Upload a new dataset from a file on your...
+  version      Prints the version of this application
 
 ```
 

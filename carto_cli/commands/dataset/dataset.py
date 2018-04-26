@@ -323,7 +323,7 @@ def describe(ctx, refresh, table_name):
 
 
 
-@click.command(help="Export your dataset")
+@click.command(help="Download a dataset")
 @click.help_option('-h', '--help')
 @click.option('-f','--format',default="gpkg",help="Format of your results",
     type=click.Choice(['gpkg','csv', 'shp','geojson']))
@@ -331,7 +331,7 @@ def describe(ctx, refresh, table_name):
               help="Output file to generate instead of printing directly")
 @click.argument('table_name')
 @click.pass_context
-def export(ctx, format, output, table_name):
+def download(ctx, format, output, table_name):
     carto_obj = ctx.obj['carto']
     if not output:
         output = open('{}.{}'.format(table_name,format), 'wb')
@@ -376,13 +376,13 @@ def export(ctx, format, output, table_name):
 
 
 
-@click.command(help="Import a new dataset from a file on your computer")
+@click.command(help="Upload a new dataset from a file on your computer")
 @click.help_option('-h', '--help')
 @click.option('-s','--sync',default=None,help="Seconds between sync updates",
     type=int)
 @click.argument('path')
 @click.pass_context
-def import_dataset(ctx, sync, path):
+def upload(ctx, sync, path):
     carto_obj = ctx.obj['carto']
 
     # Check the resource
@@ -404,11 +404,11 @@ def import_dataset(ctx, sync, path):
                     break
             click.echo("Dataset imported!")
         else:
-            task = carto_obj.import_dataset(path)
+            task = carto_obj.upload(path)
 
 
     elif os.path.exists(path):
-        task = carto_obj.import_dataset(path)
+        task = carto_obj.upload(path)
         click.echo("Local resource uploaded!")
     else:
         ctx.fail("The resource provided is not a valid URL or an existing file")
@@ -447,7 +447,6 @@ def edit(ctx, description, privacy, locked, license, attributions, tags, dataset
     dataset_manager = carto_obj.get_dataset_manager()
     try:
         dataset = dataset_manager.get(dataset_name)
-        import ipdb; ipdb.set_trace()
         if privacy:
             if privacy == 'PRIVATE':
                 dataset.privacy = PRIVATE

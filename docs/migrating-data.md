@@ -37,7 +37,7 @@ $ # Import all datasets
 $ mkdir -p processed
 $ for i in *.gpkg; do \
   echo "Importing $i ..."; \
-  carto_dataset import_dataset $i; \
+  carto_dataset upload $i; \
   mv $i uploaded; \
   done
 ```
