@@ -41,17 +41,22 @@ def get_cartodbfy_query(user,org,table_name):
     else:
         return 'SELECT CDB_CartoDBfyTable(\'{}\')'.format(table_name)
 
+def get_vrt_type(postgis_type):
+    return postgis_type.replace('ST_','wkb')
 
 @click.command(help="Display all your CARTO datasets")
 @click.option('-f', '--format', default="json", help="Format of your results",
-              type=click.Choice(['json', 'csv', 'pretty']))
+              type=click.Choice(['json', 'csv', 'pretty','vrt']))
+@click.option('-t', '--filter', help="Filter the datasets")
 @click.help_option('-h', '--help')
 @click.pass_context
-def list(ctx, format):
+def list(ctx, format, filter):
     carto_obj = ctx.obj['carto']
     manager = carto_obj.get_dataset_manager()
     try:
-        datasets = manager.all()
+        all_datasets =  manager.all()
+        datasets = [d for d in all_datasets if not filter or d.name.find(filter) > -1]
+
         dataset_names = [dataset.name for dataset in datasets]
 
         results = [
@@ -84,6 +89,24 @@ def list(ctx, format):
                     writer.writerow(row)
 
                 raw_result = csvfile.getvalue()
+        elif format == 'vrt':
+            with StringIO() as vrtfile:
+                vrtfile.write('<OGRVRTDataSource>')
+                for dataset in datasets:
+                    types = dataset.table.geometry_types
+                    if types and len(types) == 1:
+                        geom_type = get_vrt_type(types[0])
+                        template = '''
+<OGRVRTLayer name="{layer}">
+    <LayerSRS>EPSG:4326</LayerSRS>
+    <SrcDataSource>Carto:{user}</SrcDataSource>
+    <GeometryType>{geomtype}</GeometryType>
+    <SrcLayer>{layer}</SrcLayer>
+</OGRVRTLayer>'''.format(layer=dataset.name, geomtype=geom_type, user = carto_obj.user_name)
+
+                        vrtfile.write(template)
+                vrtfile.write('\r\n</OGRVRTDataSource>\r\n')
+                raw_result = vrtfile.getvalue()
         else:
             table_general = PrettyTable(
                 ['Table Name', 'Privacy', 'Locked', 'Likes', 'Size',
@@ -113,10 +136,11 @@ def list(ctx, format):
 
 @click.command(help="List tables and their main Postgres statistics")
 @click.option('-f', '--format', default="json", help="Format of your results",
-              type=click.Choice(['json', 'csv', 'pretty']))
+              type=click.Choice(['json', 'csv', 'pretty','vrt']))
+@click.option('-t', '--filter', help="Filter the tables")
 @click.help_option('-h', '--help')
 @click.pass_context
-def list_tables(ctx, format):
+def list_tables(ctx, format, filter):
     carto_obj = ctx.obj['carto']
 
     if carto_obj.org_name:
@@ -124,7 +148,7 @@ def list_tables(ctx, format):
     else:
         schema_name = 'public'
 
-    sql = queries.LIST_TABLES.format(schema_name=schema_name,table_name='%')
+    sql = queries.LIST_TABLES.format(schema_name=schema_name,table_name='%{}%'.format(filter if filter else ''))
     result = carto_obj.execute_sql(sql)
 
     if format == 'json':
