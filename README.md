@@ -1,13 +1,14 @@
-`$ carto_cli`
+`$ carto-cli`
 =========================
-
-**WORK IN PROGRESS**
 
 ## TO-DO
 
 * Finish visualization and named maps interactions
 * Set up defaults system for formats and a default account
+* Add subcommands to `carto_env` to add, update and remove entries
+* Support new `COPY` methods
 
+## TL;DR
 
 A simple set of command line applications to interact with your own CARTO account.
 
@@ -22,7 +23,11 @@ A simple set of command line applications to interact with your own CARTO accoun
 
 ### How to install
 
-As for now you need to clone or download the repo and run `pip install .` or `python setup.py install`.
+The package is available at [pypi](https://pypi.org/project/carto-cli/) so you can just run:
+
+```
+$ pip install carto-cli
+```
 
 ### How to contribute
 
@@ -65,10 +70,11 @@ Commands:
   version  Prints the version of this application
 ```
 
-So if you have the `$CARTO_ENV` environment pointing for example to `/tmp/cartoenv` and then you define `alias c="source $CARTO_ENV"` then you can load any user of your database with:
+So if you have the `$CARTO_ENV` environment pointing for example to `/tmp/cartoenv`, then you you can load any user of your database with:
 
 ```bash
-$ carto_env load jsanz; c
+$ carto_env load jsanz
+$ source /tmp/cartoenv; echo $CARTO_API_URL
 ```
 
 ### Configuration file
