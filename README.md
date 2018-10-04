@@ -7,6 +7,7 @@
 * Set up defaults system for formats and a default account
 * Add subcommands to `carto_env` to add, update and remove entries
 * Support new `COPY` methods
+* Support Auth API #3
 
 ## TL;DR
 
