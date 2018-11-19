@@ -87,7 +87,8 @@ jsanz:
   api_key: your_api_key
   organization: team
 
-another_user:
+random_key:
+  user: your_user
   api_key: another_api_key
   organization: team
 
@@ -96,6 +97,8 @@ another_user:
   organization: myorg
   url: http://myserver.mydomain.com
 ```
+
+By default the key will be your account name but you can specify a `user` key to have a different name for your configuration entry.
 
 ## `carto_sql`
 

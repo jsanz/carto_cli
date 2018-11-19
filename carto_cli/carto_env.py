@@ -43,8 +43,11 @@ def search(ctx, search):
     '''
     Search for a string in the configuration file
     '''
+    config = ctx.obj['config']
     for user in ctx.obj['config']:
-        if user.find(search) > -1:
+        if 'user' in config[user] and config[user]['user'].find(search) > -1:
+            click.echo("{} ({})".format(user,config[user]['user']))
+        elif user.find(search) > -1:
             click.echo(user)
 
 
@@ -65,20 +68,15 @@ def load(ctx, output_file, user):
     else:
         user_config = config[user]
         api_key = user_config['api_key']
-        if 'organization' in user_config:
-            org = user_config['organization']
-        else:
-            org = None
 
-        if 'url' in user_config:
-            url = user_config['url']
-        else:
-            url = 'https://{}.carto.com/'.format(user)
+        final_user = user_config['user'] if 'user' in user_config else user
+        org = user_config['organization'] if 'organization' in user_config else None
+        url = user_config['url'] if 'url' in user_config else 'https://{}.carto.com/'.format(final_user)
 
         result = '''
 export CARTO_USER="{user}"
 export CARTO_API_KEY="{api_key}"
-export CARTO_API_URL="{url}"'''.format(user=user, org=org, api_key=api_key, url=url)
+export CARTO_API_URL="{url}"'''.format(user=final_user, org=org, api_key=api_key, url=url)
 
         if org != None:
             result = result + '\nexport CARTO_ORG="{org}"'.format(org=org)
