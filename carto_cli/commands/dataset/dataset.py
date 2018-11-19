@@ -352,28 +352,28 @@ def describe(ctx, refresh, table_name):
 @click.option('-f','--format',default="gpkg",help="Format of your results",
     type=click.Choice(['gpkg','csv', 'shp','geojson']))
 @click.option('-o','--output',type=click.File('wb'),
-              help="Output file to generate instead of printing directly")
+              help="Output file to generate")
 @click.argument('table_name')
 @click.pass_context
 def download(ctx, format, output, table_name):
     carto_obj = ctx.obj['carto']
-    if not output:
-        output = open('{}.{}'.format(table_name,format), 'wb')
-
+    
     # Check table size
     sql = "select count(*) from {}".format(table_name)
     result = carto_obj.execute_sql(sql)
     counts = int(result['rows'][0]['count'])
 
     if counts > SPLIT_EXPORT:
-        click.echo("Table is too big, we need to download it in chunks")
+        click.echo("Table is too big ({}), we need to download it in chunks of {} rows".format(counts, SPLIT_EXPORT))
         ind = 1
         base, ext = os.path.splitext(output.name)
         for i in range(1,counts,SPLIT_EXPORT):
             sql = '''
-                    select * from {table_name}
-                  order by cartodb_id
-                     limit {limit} offset {offset}
+                    select * 
+                      from {table_name}
+                     order by cartodb_id
+                     limit {limit} 
+                    offset {offset}
                   '''.format(
                         table_name = table_name,
                         limit = SPLIT_EXPORT,
