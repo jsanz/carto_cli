@@ -93,13 +93,15 @@ random_key:
   api_key: another_api_key
   organization: team
 
-another_user:
+onprem_user:
   api_key: your_api_key
   organization: myorg
-  url: http://myserver.mydomain.com
+  url: http://myserver.mydomain.com/user/username
 ```
 
 By default the key will be your account name but you can specify a `user` key to have a different name for your configuration entry.
+
+**Note**: Remember also that CARTO On-Premises instances are usually configured as domainless set ups so the username must be specificied in the url as in the last example above, where `url` is set up to `https://onprem-host/user/username`.
 
 ## `carto_sql`
 
