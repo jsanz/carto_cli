@@ -302,9 +302,12 @@ def describe(ctx, refresh, table_name):
         table_general = PrettyTable(['Property','Value'])
         table_general.align = "l"
 
-        for row in result['rows']:
-            for key in row.keys():
-                table_general.add_row([key,row[key]])
+        if not result['rows']:
+            raise Exception('This table does not exist.')
+        else:
+            for row in result['rows']:
+                for key in row.keys():
+                    table_general.add_row([key,row[key]])
 
         click.echo('\r\n# Report for table: {}'.format(table_name))
         click.echo('\r\n## Postgres Metadata\r\n')
