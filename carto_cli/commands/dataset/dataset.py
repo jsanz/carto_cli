@@ -8,6 +8,7 @@ import time
 from prettytable import PrettyTable
 from carto_cli.carto import queries
 from carto_cli.commands.sql.execute_sql import run as run_sql
+from carto_cli.utils import check_piped_arg
 
 from carto.permissions import PRIVATE, PUBLIC, LINK
 
@@ -182,10 +183,11 @@ def list_tables(ctx, format, filter):
 @click.option('-f', '--format', default="json", help="Format of your results",
               type=click.Choice(['json', 'csv', 'pretty']))
 @click.help_option('-h', '--help')
-@click.argument('table_name')
+@click.argument('table_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def schema(ctx, format, table_name):
     carto_obj = ctx.obj['carto']
+
     sql = queries.SCHEMA.format(table_name=table_name)
     result = carto_obj.execute_sql(sql)
 
@@ -217,10 +219,11 @@ def schema(ctx, format, table_name):
 @click.option('-f', '--format', default="json", help="Format of your results",
               type=click.Choice(['json', 'csv', 'pretty']))
 @click.help_option('-h', '--help')
-@click.argument('table_name')
+@click.argument('table_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def triggers(ctx, format, table_name):
     carto_obj = ctx.obj['carto']
+
     sql = queries.TRIGGERS.format(table_name=table_name)
     result = carto_obj.execute_sql(sql)
     fieldnames = ['tgname']
@@ -253,10 +256,11 @@ def triggers(ctx, format, table_name):
 @click.option('-f', '--format', default="json", help="Format of your results",
               type=click.Choice(['json', 'csv', 'pretty']))
 @click.help_option('-h', '--help')
-@click.argument('table_name')
+@click.argument('table_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def indexes(ctx, format, table_name):
     carto_obj = ctx.obj['carto']
+
     sql = queries.INDEXES.format(table_name=table_name)
     result = carto_obj.execute_sql(sql)
     fieldnames = ['index_name', 'column_name', 'index_type']
@@ -288,10 +292,11 @@ def indexes(ctx, format, table_name):
 @click.option('-r','--refresh',is_flag=True,default=False,
     help="Force statistics refresh")
 @click.help_option('-h', '--help')
-@click.argument('table_name')
+@click.argument('table_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def describe(ctx, refresh, table_name):
     carto_obj = ctx.obj['carto']
+
     try:
         if refresh:
             result = carto_obj.execute_sql('vacuum analyze {}'.format(table_name))
@@ -356,11 +361,11 @@ def describe(ctx, refresh, table_name):
     type=click.Choice(['gpkg','csv', 'shp','geojson']))
 @click.option('-o','--output',type=click.File('wb'),
               help="Output file to generate")
-@click.argument('table_name')
+@click.argument('table_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def download(ctx, format, output, table_name):
     carto_obj = ctx.obj['carto']
-    
+
     # Check table size
     sql = "select count(*) from {}".format(table_name)
     result = carto_obj.execute_sql(sql)
@@ -407,7 +412,7 @@ def download(ctx, format, output, table_name):
 @click.help_option('-h', '--help')
 @click.option('-s','--sync',default=None,help="Seconds between sync updates",
     type=int)
-@click.argument('path')
+@click.argument('path', callback=check_piped_arg, required=False)
 @click.pass_context
 def upload(ctx, sync, path):
     carto_obj = ctx.obj['carto']
@@ -443,11 +448,12 @@ def upload(ctx, sync, path):
 
 @click.command(help="Deletes a dataset from your account")
 @click.help_option('-h', '--help')
-@click.argument('table_name')
+@click.argument('table_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def delete(ctx, table_name):
     carto_obj = ctx.obj['carto']
-    dataset_manager = carto_obj.get_dataset_manager();
+
+    dataset_manager = carto_obj.get_dataset_manager()
     dataset = dataset_manager.get(table_name)
     if dataset:
         dataset.delete()
@@ -467,7 +473,7 @@ def delete(ctx, table_name):
 @click.option('-l', '--license', help="Set your dataset license")
 @click.option('-a', '--attributions', help="Set your dataset attributions")
 @click.option('-t', '--tags', help="Set your dataset tags, use commas to separate them")
-@click.argument('dataset_name')
+@click.argument('dataset_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def edit(ctx, description, privacy, locked, license, attributions, tags, dataset_name):
     carto_obj = ctx.obj['carto']
@@ -504,7 +510,7 @@ def edit(ctx, description, privacy, locked, license, attributions, tags, dataset
 @click.pass_context
 def rename(ctx, old, new):
     carto_obj = ctx.obj['carto']
-    dataset_manager = carto_obj.get_dataset_manager();
+    dataset_manager = carto_obj.get_dataset_manager()
     dataset = dataset_manager.get(old)
     if dataset:
         dataset.name = new
@@ -539,8 +545,8 @@ def merge(ctx, table_name_prefix,new_table_name):
 
     # build the list of queries
     query_list = [
-        'CREATE TABLE {} AS SELECT {} FROM {}'.format(new_table_name,columns,tables[0]),
-    ];
+        'CREATE TABLE {} AS SELECT {} FROM {}'.format(new_table_name,columns,tables[0])
+    ]
     for table in tables[1:]:
         query_list.append('''INSERT INTO {first_table} SELECT {columns} FROM {table}'''.format(
                 first_table = new_table_name,
@@ -560,10 +566,11 @@ def merge(ctx, table_name_prefix,new_table_name):
 
 @click.command(help="Runs the cartodbfication of a table to convert it into a dataset")
 @click.help_option('-h', '--help')
-@click.argument('table_name')
+@click.argument('table_name', callback=check_piped_arg, required=False)
 @click.pass_context
 def cartodbfy(ctx, table_name):
     carto_obj = ctx.obj['carto']
+
     job_details = carto_obj.batch_create(get_cartodbfy_query(
         org=carto_obj.org_name,
         user=carto_obj.user_name,

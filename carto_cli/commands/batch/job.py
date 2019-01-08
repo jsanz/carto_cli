@@ -1,8 +1,10 @@
 import click
 import json
 import re
+import sys
 
 from carto_cli.carto import queries
+from carto_cli.utils import check_piped_arg
 
 
 @click.command(help="Display the ids of all your running jobs")
@@ -28,7 +30,7 @@ def list(ctx):
 
 
 @click.command(help="Returns details about a job id (JSON)")
-@click.argument('job_id')
+@click.argument('job_id', callback=check_piped_arg, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def read(ctx,job_id):
@@ -45,7 +47,7 @@ def read(ctx,job_id):
 
 
 @click.command(help="Creates a new job and returns its ID")
-@click.argument('sql', nargs=-1)
+@click.argument('sql', nargs=-1, callback=check_piped_arg, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def create(ctx,sql):
@@ -63,7 +65,7 @@ def create(ctx,sql):
 
 
 @click.command(help="Cancels a job")
-@click.argument('job_id')
+@click.argument('job_id', callback=check_piped_arg, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def cancel(ctx,job_id):

@@ -4,6 +4,8 @@ import csv
 
 from prettytable import PrettyTable
 from carto_cli.carto import queries
+from carto_cli.utils import check_piped_arg
+
 
 try:
     from StringIO import StringIO
@@ -19,10 +21,11 @@ except ImportError:
 @click.option('-ea','--explain-analyze',is_flag=True,default=False,help="Explains the query executing it")
 @click.option('-eaj','--explain-analyze-json',is_flag=True,default=False,help="Explains the query executing it and return as a JSON")
 @click.help_option('-h', '--help')
-@click.argument('sql', nargs=-1)
+@click.argument('sql', nargs=-1, callback=check_piped_arg, required=False)
 @click.pass_context
 def run(ctx,format,output,explain,explain_analyze,explain_analyze_json,sql):
     carto_obj = ctx.obj['carto']
+
     if type(sql) == tuple:
         sql = ' '.join(sql)
     try:
@@ -54,11 +57,12 @@ def run(ctx,format,output,explain,explain_analyze,explain_analyze_json,sql):
 
 
 @click.command(help="Kills a query based on its pid")
-@click.argument('pid',type=int)
+@click.argument('pid', type=int, callback=check_piped_arg, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def kill(ctx,pid):
     carto_obj = ctx.obj['carto']
+
     sql = queries.KILL_QUERY.format(pid)
 
     try:
@@ -71,7 +75,7 @@ def kill(ctx,pid):
             else:
                 ctx.fail('Invalid PID?')
         else:
-            raise
+            raise Exception('No rows were returned')
     except Exception as e:
         ctx.fail("Error cancelling the query: {}".format(e))
 
