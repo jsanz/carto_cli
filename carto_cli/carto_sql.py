@@ -2,8 +2,6 @@ import click
 import os.path
 import yaml
 
-from carto_cli.utils import check_piped_arg
-
 from .carto.carto_user import CARTOUser
 from .carto.version import version
 
