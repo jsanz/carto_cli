@@ -38,14 +38,13 @@ def list(ctx):
 
 
 @cli.command(help='Returns the user names that match the given string')
-@click.argument('search', required=False)
+@click.argument('search', callback=check_piped_arg, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def search(ctx, search):
     '''
     Search for a string in the configuration file
     '''
-    search = check_piped_arg(ctx, search, 'search string')
 
     config = ctx.obj['config']
     for user in ctx.obj['config']:
@@ -59,7 +58,7 @@ def search(ctx, search):
 @click.option('-o', '--output-file', type=click.File('w'), envvar='CARTO_ENV',
               help="Output file to store the export commands, it can use the" +
                    " $CARTO_ENV environment variable")
-@click.argument('user', required=False)
+@click.argument('user', callback=check_piped_arg, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def load(ctx, output_file, user):
@@ -67,7 +66,6 @@ def load(ctx, output_file, user):
     Tries to load the information as a easy copy&paste set of env vars
     '''
     config = ctx.obj['config']
-    user = check_piped_arg(ctx, user, 'username')
 
     if not user in config:
         ctx.fail('User not found on config')

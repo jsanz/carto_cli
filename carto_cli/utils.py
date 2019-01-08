@@ -4,15 +4,14 @@ General purpose functions can be stored here.
 
 import sys
 
-def check_piped_arg(ctx, main_arg, arg_label='job ID'):
-    if main_arg:
-        return main_arg
+def check_piped_arg(ctx, param, value):
+    if value:
+        return value
     else:
         if not sys.stdin.isatty():
             return sys.stdin.read().rstrip()
         else:
-            n = 'n' if arg_label[0].lower() in ['a','e','i','o','u'] else ''
             ctx.fail(
-                f"A{n} {arg_label} is required. "
+                f"Missing argument: {param.human_readable_name}.\n"
                 "Either pass it explicitly or pipe into the command"
             )

@@ -21,11 +21,10 @@ except ImportError:
 @click.option('-ea','--explain-analyze',is_flag=True,default=False,help="Explains the query executing it")
 @click.option('-eaj','--explain-analyze-json',is_flag=True,default=False,help="Explains the query executing it and return as a JSON")
 @click.help_option('-h', '--help')
-@click.argument('sql', nargs=-1, required=False)
+@click.argument('sql', nargs=-1, callback=check_piped_arg, required=False)
 @click.pass_context
 def run(ctx,format,output,explain,explain_analyze,explain_analyze_json,sql):
     carto_obj = ctx.obj['carto']
-    sql = check_piped_arg(ctx, sql, 'SQL query')
 
     if type(sql) == tuple:
         sql = ' '.join(sql)
@@ -58,12 +57,11 @@ def run(ctx,format,output,explain,explain_analyze,explain_analyze_json,sql):
 
 
 @click.command(help="Kills a query based on its pid")
-@click.argument('pid', type=int, required=False)
+@click.argument('pid', type=int, callback=check_piped_arg, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def kill(ctx,pid):
     carto_obj = ctx.obj['carto']
-    pid = check_piped_arg(ctx, pid, 'PID')
 
     sql = queries.KILL_QUERY.format(pid)
 
