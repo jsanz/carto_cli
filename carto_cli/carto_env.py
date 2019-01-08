@@ -2,6 +2,8 @@ import click
 import os.path
 import yaml
 
+from carto_cli.utils import check_piped_arg
+
 from .carto.version import version
 
 default_config_file = os.environ.get(
@@ -36,13 +38,15 @@ def list(ctx):
 
 
 @cli.command(help='Returns the user names that match the given string')
-@click.argument('search')
+@click.argument('search', required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def search(ctx, search):
     '''
     Search for a string in the configuration file
     '''
+    search = check_piped_arg(ctx, search, 'search string')
+
     config = ctx.obj['config']
     for user in ctx.obj['config']:
         if 'user' in config[user] and config[user]['user'].find(search) > -1:
@@ -51,11 +55,11 @@ def search(ctx, search):
             click.echo(user)
 
 
-@cli.command(help='The user wou want to retrieve')
+@cli.command(help='The user you want to retrieve')
 @click.option('-o', '--output-file', type=click.File('w'), envvar='CARTO_ENV',
               help="Output file to store the export commands, it can use the" +
                    " $CARTO_ENV environment variable")
-@click.argument('user')
+@click.argument('user', required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def load(ctx, output_file, user):
@@ -63,6 +67,8 @@ def load(ctx, output_file, user):
     Tries to load the information as a easy copy&paste set of env vars
     '''
     config = ctx.obj['config']
+    user = check_piped_arg(ctx, user, 'username')
+
     if not user in config:
         ctx.fail('User not found on config')
     else:

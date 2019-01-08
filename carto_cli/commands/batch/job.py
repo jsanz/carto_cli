@@ -1,8 +1,10 @@
 import click
 import json
 import re
+import sys
 
 from carto_cli.carto import queries
+from carto_cli.utils import check_piped_arg
 
 
 @click.command(help="Display the ids of all your running jobs")
@@ -28,7 +30,7 @@ def list(ctx):
 
 
 @click.command(help="Returns details about a job id (JSON)")
-@click.argument('job_id')
+@click.argument('job_id', required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def read(ctx,job_id):
@@ -36,6 +38,7 @@ def read(ctx,job_id):
     Just returns the details of a job using as a JSON
     '''
     carto_obj = ctx.obj['carto']
+    job_id = check_piped_arg(ctx, job_id)
     try:
         job_details = carto_obj.batch_check(job_id)
         click.echo(json.dumps(job_details))
@@ -45,7 +48,7 @@ def read(ctx,job_id):
 
 
 @click.command(help="Creates a new job and returns its ID")
-@click.argument('sql', nargs=-1)
+@click.argument('sql', nargs=-1, required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def create(ctx,sql):
@@ -53,6 +56,7 @@ def create(ctx,sql):
     Creates a new job and returns it's ID
     '''
     carto_obj = ctx.obj['carto']
+    sql = check_piped_arg(ctx, sql, 'SQL query')
     if type(sql) == tuple:
         sql = ' '.join(sql)
 
@@ -63,7 +67,7 @@ def create(ctx,sql):
 
 
 @click.command(help="Cancels a job")
-@click.argument('job_id')
+@click.argument('job_id', required=False)
 @click.help_option('-h', '--help')
 @click.pass_context
 def cancel(ctx,job_id):
@@ -71,6 +75,7 @@ def cancel(ctx,job_id):
     Just returns the details of a job using as a JSON
     '''
     carto_obj = ctx.obj['carto']
+    job_id = check_piped_arg(ctx, job_id)
 
     job_details = carto_obj.batch_cancel(job_id)
 
