@@ -1,6 +1,6 @@
 import click
 
-CARTO_CLI_VERSION='0.0.3'
+CARTO_CLI_VERSION='0.0.4'
 
 @click.command(help='Prints the version of this application')
 @click.help_option('-h', '--help')
