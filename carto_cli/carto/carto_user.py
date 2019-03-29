@@ -1,4 +1,5 @@
 from carto.exceptions import CartoException
+from carto.sql import CopySQLClient
 from carto.sql import SQLClient
 from carto.sql import BatchSQLClient
 from carto.auth import APIKeyAuthClient
@@ -8,6 +9,7 @@ from carto.sync_tables import SyncTableJobManager
 import warnings
 import requests
 import contextlib
+from pathlib import Path
 
 try:
     from functools import partialmethod
@@ -52,6 +54,7 @@ class CARTOUser(object):
 
         self.sql_client = SQLClient(self.client)
         self.batch_client = BatchSQLClient(self.client)
+        self.copy_client = CopySQLClient(self.client)
 
     def execute_sql(self, query, parse_json=True, format=None, do_post=False):
         try:
@@ -112,3 +115,21 @@ class CARTOUser(object):
             return dataset_manager.create(uri, sync_time)
         else:
             return dataset_manager.create(uri)
+
+    def copy_from(self, path, query, tablename=None, delimiter=','):
+        try:
+            self.copy_client
+        except AttributeError:
+            self.initialize()
+
+        with open(path) as myfile:
+            headers = next(myfile).strip()
+
+        if tablename is None:
+            tablename = Path(path).stem
+
+        if query is None:
+            query = f"""COPY {tablename} ({headers}) FROM stdin
+            (FORMAT CSV, DELIMITER '{delimiter}', HEADER true, QUOTE '"')"""
+
+        return self.copy_client.copyfrom_file_path(query, path)

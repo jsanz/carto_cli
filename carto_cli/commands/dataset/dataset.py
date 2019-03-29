@@ -445,6 +445,22 @@ def upload(ctx, sync, path):
     else:
         ctx.fail("The resource provided is not a valid URL or an existing file")
 
+@click.command(help="Copy a new dataset from a file on your computer")
+@click.help_option('-h', '--help')
+@click.option('-t', '--tablename', help="Table to copy to", required=False)
+@click.option('-d', '--delimiter', help="csv delimiter. Default comma",default=",")
+@click.argument('path', callback=check_piped_arg, required=True)
+@click.argument('query', required=False)
+
+@click.pass_context
+def copy_from(ctx, path, query=None, tablename=None, delimiter=',',):
+    carto_obj = ctx.obj['carto']
+
+    if os.path.exists(path):
+        task = carto_obj.copy_from(path, query, tablename, delimiter)
+        click.echo("Local resource uploaded!")
+    else:
+        ctx.fail("The resource provided is not an existing file")
 
 @click.command(help="Deletes a dataset from your account")
 @click.help_option('-h', '--help')
