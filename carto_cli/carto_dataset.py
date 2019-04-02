@@ -50,6 +50,7 @@ cli.add_command(dataset.edit)
 cli.add_command(dataset.merge)
 cli.add_command(dataset.cartodbfy)
 cli.add_command(dataset.copy_from)
+cli.add_command(dataset.copy_to)
 
 if __name__ == '__main__':
     cli(obj={})

@@ -445,15 +445,14 @@ def upload(ctx, sync, path):
     else:
         ctx.fail("The resource provided is not a valid URL or an existing file")
 
-@click.command(help="Copy a new dataset from a file on your computer")
+@click.command(help="Copy data from a file on your computer")
 @click.help_option('-h', '--help')
 @click.option('-t', '--tablename', help="Table to copy to", required=False)
 @click.option('-d', '--delimiter', help="csv delimiter. Default comma",default=",")
 @click.argument('path', callback=check_piped_arg, required=True)
 @click.argument('query', required=False)
-
 @click.pass_context
-def copy_from(ctx, path, query=None, tablename=None, delimiter=',',):
+def copy_from(ctx, path, query=None, tablename=None, delimiter=','):
     carto_obj = ctx.obj['carto']
 
     if os.path.exists(path):
@@ -461,6 +460,29 @@ def copy_from(ctx, path, query=None, tablename=None, delimiter=',',):
         click.echo("Local resource uploaded!")
     else:
         ctx.fail("The resource provided is not an existing file")
+
+
+@click.command(help="Copy data to a file on your computer")
+@click.help_option('-h', '--help')
+@click.argument('query', required=True)
+@click.argument('path')
+@click.option('-d', '--delimiter', help="csv delimiter. Default comma",default=",")
+@click.pass_context
+def copy_to(ctx, query, path, delimiter=','):
+    # ctx.invoke(run_sql,
+    #     format = 'csv',
+    #     output = output,
+    #     explain = False,
+    #     explain_analyze = False,
+    #     sql = query)
+    # click.echo("Query exported to {}".format(output.name))
+    carto_obj = ctx.obj['carto']
+    if os.path.exists(path):
+        ctx.fail("File exists!")
+    else:
+        task = carto_obj.copy_to(query, path, delimiter)
+        click.echo(f"Query exported to {path}")
+
 
 @click.command(help="Deletes a dataset from your account")
 @click.help_option('-h', '--help')

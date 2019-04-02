@@ -133,3 +133,15 @@ class CARTOUser(object):
             (FORMAT CSV, DELIMITER '{delimiter}', HEADER true, QUOTE '"')"""
 
         return self.copy_client.copyfrom_file_path(query, path)
+
+
+    def copy_to(self, query, output, delimiter=','):
+        try:
+            self.copy_client
+        except AttributeError:
+            self.initialize()
+
+        copy_query = f"""COPY ({query}) TO stdout WITH
+        (FORMAT CSV, DELIMITER '{delimiter}', HEADER true, QUOTE '"')"""
+
+        return self.copy_client.copyto_file_path(copy_query, output)
