@@ -16,7 +16,7 @@ try:
     with open('requirements.txt') as f:
         required = f.read().splitlines()
 except:
-    required = ['carto==1.3.0', 'click>=6.7','PyYAML=3.12','prettytable=0.7.2']
+    required = ['carto==1.3.0', 'click>=6.7', 'PyYAML==3.12', 'prettytable==0.7.2']
 
 try:
     with open('test_requirements.txt') as f:
@@ -30,7 +30,7 @@ setup(name="carto-cli",
       description="Command Line applications to interact with your CARTO account",
       long_description=read('README.md'),
       long_description_content_type="text/markdown",
-      keywords = "carto cli cartodb api",
+      keywords="carto cli cartodb api",
       license="MIT",
       classifiers=[
           "License :: OSI Approved :: MIT License",
