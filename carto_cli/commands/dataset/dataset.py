@@ -467,8 +467,9 @@ def copy_from(ctx, path, query=None, tablename=None, delimiter=','):
 @click.argument('query', required=True)
 @click.argument('path')
 @click.option('-d', '--delimiter', help="csv delimiter. Default comma",default=",")
+@click.option('-w', '--do-no-overwrite',is_flag=True,help="Do no overwrite",default=True)
 @click.pass_context
-def copy_to(ctx, query, path, delimiter=','):
+def copy_to(ctx, query, path, delimiter=',', do_no_overwrite=True):
     # ctx.invoke(run_sql,
     #     format = 'csv',
     #     output = output,
@@ -477,11 +478,11 @@ def copy_to(ctx, query, path, delimiter=','):
     #     sql = query)
     # click.echo("Query exported to {}".format(output.name))
     carto_obj = ctx.obj['carto']
-    if os.path.exists(path):
+    if os.path.exists(path) and do_no_overwrite:
         ctx.fail("File exists!")
-    else:
-        task = carto_obj.copy_to(query, path, delimiter)
-        click.echo(f"Query exported to {path}")
+        return
+    task = carto_obj.copy_to(query, path, delimiter)
+    click.echo(f"Query exported to {path}")
 
 
 @click.command(help="Deletes a dataset from your account")

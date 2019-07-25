@@ -122,16 +122,15 @@ class CARTOUser(object):
         except AttributeError:
             self.initialize()
 
-        with open(path) as myfile:
-            headers = next(myfile).strip()
-
         if tablename is None:
             tablename = Path(path).stem
 
         if query is None:
-            query = f"""COPY {tablename} ({headers}) FROM stdin
-            (FORMAT CSV, DELIMITER '{delimiter}', HEADER true, QUOTE '"')"""
-
+            with open(path, 'rb') as myfile:
+                headers = next(myfile).strip().decode('utf8')
+                query = f"""COPY {tablename} ({headers}) FROM stdin
+                (FORMAT CSV, DELIMITER '{delimiter}', HEADER false, QUOTE '"')"""
+                return self.copy_client.copyfrom_file_object(query, myfile)
         return self.copy_client.copyfrom_file_path(query, path)
 
 
